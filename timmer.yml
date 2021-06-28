@@ -1,0 +1,21 @@
+---
+resources:
+- name: my-timer
+  type: time
+  icon: clock-outline
+  source:
+    interval: 2m
+jobs:
+- name: job-demo
+  plan:
+  - get: my-timer
+    trigger: true
+  - task: pwd
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: busybox }
+      run:
+        path: pwd
+        

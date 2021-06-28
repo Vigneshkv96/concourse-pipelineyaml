@@ -1,0 +1,27 @@
+---
+resources:
+- name: concourse-pipeline-from-git
+  type: git
+  source:
+    uri: https://github.com/Vigneshkv96/concourse-pipeline.git
+    username: vigneshkv96@gmail.com
+    password: Git@1109
+    branch: main
+    
+jobs:
+- name: job-git
+  public: true
+  plan: 
+  - get: concourse-pipeline-from-git
+  - task: git-job
+    config:
+      #inputs:
+       # - name: concouse-pipeline-from-git
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: busybox }
+      run:
+        path: ls
+        args: ["-la"]
+
