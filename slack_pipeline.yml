@@ -1,0 +1,57 @@
+---
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+
+- name: slack-alert
+  type: docker-image
+  source:
+    repository: arbourd/concourse-slack-alert-resource
+
+resources:
+
+- name: notify
+  type: slack-alert
+  source:
+    url: ((slack_pipeline.uri)) #https://hooks.slack.com/services/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 
+
+#- name: slk-notify
+#  type: slack-alert
+#  source:
+#    url: https://hooks.slack.com/services/T024VU91V/A0275SG9Q10/362442966909858694/CqGvSkD1ywkpgHRGsLr6Gk1B
+    # `alert_type: fixed` requires Concourse credentials if pipeline is private
+#    channel:  testmail
+#    username: test
+#    password: test
+
+jobs:
+- name: test-job
+  public: true
+  plan:
+  - task: simple-task
+    params: 
+      usr: ((demo_value.TEST))
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: busybox }
+      run:
+        path: /bin/sh
+        args:
+          - -cx
+          - |
+            echo $usr 
+      outputs:
+       - name: notify_message
+    on_success:
+      put: notify 
+      params:
+        message: Completed
+        #data: success
+        color: "#eeeeee"
+        text: "Job Completed Sucessfully"
+        alert_type: success 
+      
